@@ -1,2 +1,9 @@
-I am a READ MEEEEEEEEE RAWRRRRRRRR!!!!!!!!!
-Hi
+Hello everyone,
+
+This is code for Oregon State Mars Rover team. 
+
+The code in the Interface folder is a QT based base station interface.
+
+The code in the Rover folder is the code used on the rover.
+
+The code in the Sample folder is sample code that might be helpful to look at.
