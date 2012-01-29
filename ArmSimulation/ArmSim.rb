@@ -2,16 +2,26 @@ require 'ruby-processing'
 
 class ArmSim < Processing::App
 	
-	def setup()
-		require "Position"
+	def setup
+
+		method = :position
+		if method == :velocity
+			require "Velocity"
+		else
+			require "Position"
+		end
+
+		method_setup
+
 		setup_seg
+		
 		@endTarget = { :x=>629 , :y=>600 }
 		@target = { :x=>729 , :y=>599 }
-		size(1000, 1000);
-		smooth(); 
-		strokeWeight(20.0);
-		stroke(0, 100);
-		fill(0, 102, 153);
+		size(1000, 1000)
+		smooth()
+		strokeWeight(20.0)
+		stroke(0, 100)
+		fill(0, 102, 153)
 	end
 
 	def setup_seg
@@ -22,8 +32,7 @@ class ArmSim < Processing::App
 		@seg = [@seg0,@seg1,@seg2,@seg3]
 	end
 
-	def draw()
-		@angle = 0
+	def draw
 		background(226)
 		
 		display_text

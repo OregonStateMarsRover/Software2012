@@ -1,15 +1,20 @@
-@stepSize = 1
+
+def method_setup
+	@stepSize = 1
+	@calculate = 2
+end
 
 def draw_arm
-
-	positionSegment(@seg[0], @seg[1])
-	positionSegment(@seg[1], @seg[2])
-	positionSegment(@seg[2], @seg[3])
-
-	nextTarget()
 	
-	reachSegment(@seg[2], @endTarget)
-	reachSegment(@seg[1], @target)
+	1.upto(3) { |i|
+		positionSegment(@seg[i-1], @seg[i])
+	}
+	
+	nextTarget()
+	@calculate.times {
+		reachSegment(@seg[2], @endTarget)
+		reachSegment(@seg[1], @target)	
+	}
 	translate(@seg[0][:pos][:x], @seg[0][:pos][:y])
 	
 	strokeWeight(10)
