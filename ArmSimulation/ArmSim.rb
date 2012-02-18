@@ -1,9 +1,17 @@
-require 'ruby-processing'
+$LOAD_PATH << './usr/lib/ruby1.8'
 
+$LOAD_PATH << './usr/share/'
+
+require 'ruby-processing'
+require 'joystick'
+#require 'mkmf'
+#create_makefile('joystick')
 class ArmSim < Processing::App
 	
 	def setup
-
+		@joy = Joystick::Device.open('/dev/input/js0')
+		@y_dir = 0
+		@x_dir = 0
 		method = :position
 		if method == :velocity
 			require "Velocity"
@@ -33,6 +41,7 @@ class ArmSim < Processing::App
 	end
 
 	def draw
+		check_js()
 		background(226)
 		
 		display_text
@@ -128,6 +137,44 @@ class ArmSim < Processing::App
 			@endTarget[:x] = endPoint[:x] + @stepSize
 			@endTarget[:y] = endPoint[:y] 
 		end
+	end
+	def check_js
+		@mode = :key
+		@keypressed = key
+		ev = joy.ev
+    if ev.type == Joystick::Event::AXIS then
+				if ev.num == 5 then
+					if ev.val > 0 then
+						@y_dir = 1
+					elsif ev.val < 0 then
+						@y_dir = -1
+					else
+						@y_dir = 0
+					end
+				elsif ev.num == 4 then
+					if ev.val > 0 then
+						@x_dir = 1
+					elsif ev.val < 0 then
+						@x_dir = -1
+					else
+						@x_dir = 0
+					end
+				end
+
+    end
+		
+		@endTarget[:x] = endPoint[:x] + @stepSize*@x_dir
+		@endTarget[:y] = endPoint[:y] + @stepSize*@y_dir
+		#elvsif key == 's' then
+		#	@endTarget[:x] = endPoint[:x]
+		#	@endTarget[:y] = endPoint[:y] + @stepSize
+		#elsif key == 'a' then
+		#	@endTarget[:x] = endPoint[:x] - @stepSize
+		#	@endTarget[:y] = endPoint[:y] 
+		#elsif key == 'd' then
+		#	@endTarget[:x] = endPoint[:x] + @stepSize
+		#	@endTarget[:y] = endPoint[:y] 
+		#end
 	end
 	
 end
