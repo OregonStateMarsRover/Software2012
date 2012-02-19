@@ -49,6 +49,13 @@ class ArmSim < Processing::App
 		pushMatrix()
 			draw_arm
 		popMatrix()
+
+		@seg[2][:angle] = calculate_angle(@seg[1][:angle2],@seg[2][:angle2]);
+		@seg[3][:angle] = calculate_angle(@seg[2][:angle2],@seg[3][:angle2]);
+	end
+
+	def calculate_angle(angle1, angle2)
+		180 - (angle1 - angle2)
 	end
 
 	def display_text
