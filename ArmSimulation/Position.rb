@@ -1,7 +1,7 @@
 
 def method_setup
 	@stepSize = 1
-	@calculate = 2
+	@calculate = 20
 end
 
 def draw_arm

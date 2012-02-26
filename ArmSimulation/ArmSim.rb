@@ -1,15 +1,15 @@
-$LOAD_PATH << './usr/lib/ruby1.8'
+#$LOAD_PATH << './usr/lib/ruby1.8'
 
-$LOAD_PATH << './usr/share/'
+#$LOAD_PATH << './usr/share/'
 
 require 'ruby-processing'
-require 'joystick'
+#require 'joystick'
 #require 'mkmf'
 #create_makefile('joystick')
 class ArmSim < Processing::App
 	
 	def setup
-		@joy = Joystick::Device.open('/dev/input/js0')
+		#@joy = Joystick::Device.open('/dev/input/js0')
 		@y_dir = 0
 		@x_dir = 0
 		method = :position
@@ -41,7 +41,7 @@ class ArmSim < Processing::App
 	end
 
 	def draw
-		check_js()
+		#check_js()
 		background(226)
 		
 		display_text
