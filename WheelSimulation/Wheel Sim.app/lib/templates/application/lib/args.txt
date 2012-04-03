@@ -1,3 +1,0 @@
-
-org.jruby.Main lib/ruby-processing/runners/run.rb lib/WheelSim.rb
-core/jruby-complete.jar
