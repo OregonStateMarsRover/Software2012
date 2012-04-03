@@ -2,6 +2,7 @@
 require 'ruby-processing'
 require 'Rover'
 require 'WheelMath'
+require 'js'
 #require 'HScrollbar'
 
 class WheelSim < Processing::App
@@ -18,6 +19,10 @@ class WheelSim < Processing::App
 		@hs2 = HScrollbar.new(0,400,40)
 		@offset_detail = {:x => 300, :y => 200}
 		@drive_mode = :explicit
+		@js = Joystick.new
+		Thread.new{
+			@js.start
+		}
 	end
 
 	def setup_wheels
@@ -28,6 +33,7 @@ class WheelSim < Processing::App
 	end
 
 	def draw
+		puts @js.to_s
 		background(226)
 		pushMatrix()
 		translate(@offset[:x], @offset[:y])
@@ -85,7 +91,7 @@ class WheelSim < Processing::App
 		fill(0, 102, 153)
 		if @drive_mode == :zeroRadius
 			fill(0, 0, 0)
-    		end  
+		end  
 		rect(225,85,20,20)
 
 		fill(0, 0, 0)
