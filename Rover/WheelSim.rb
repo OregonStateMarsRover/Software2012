@@ -24,6 +24,7 @@ class WheelSim < Processing::App
  		@offset = {:x => 50, :y => 200}
 		@rover = Rover.instance
 		@wheels = @rover.wheels
+		@current_wheel = @wheels[0] 
 	end
 
 	def draw
@@ -47,13 +48,16 @@ class WheelSim < Processing::App
 		@wheels.each{ |wheel|
 			pushMatrix()
 				draw_wheel(wheel)
-			popMatrix()	
+			popMatrix()
+			if over_wheel? wheel
+				@current_wheel = wheel
+			end 
 		}
 
 		popMatrix()
 
 		pushMatrix()
-			details(@wheels[0])
+			details(@current_wheel)
 		popMatrix()
 
 		strokeWeight(1.0)
@@ -124,7 +128,7 @@ class WheelSim < Processing::App
 
 	def connect(wheel1, wheel2, wheel3, wheel4)
 		strokeWeight(10.0)
-		line((wheel1.pos[:x] + wheel2.pos[:x])/2, (wheel1.pos[:y] + wheel2.pos[:y])/2,(wheel3.pos[:x] + wheel4.poS[:x])/2, (wheel3.pos[:y] + wheel4.pos[:y])/2)
+		line((wheel1.pos[:x] + wheel2.pos[:x])/2, (wheel1.pos[:y] + wheel2.pos[:y])/2,(wheel3.pos[:x] + wheel4.pos[:x])/2, (wheel3.pos[:y] + wheel4.pos[:y])/2)
 	end
 
 	def draw_wheel(wheel)
@@ -140,8 +144,8 @@ class WheelSim < Processing::App
 	end
 
 
-	def over?
-		return mouseX.between?(@pos,@pos+10) && mouseY.between?(@y,@y+10)
+	def over_wheel?(wheel)
+		return mouse_x.between?(wheel.pos[:x]-15+@offset[:x],wheel.pos[:x]+15+@offset[:x]) && mouse_y.between?(wheel.pos[:y]-15+@offset[:y],wheel.pos[:y]+15+@offset[:y])
 	end
 
 	class HScrollbar
