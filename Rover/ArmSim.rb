@@ -1,6 +1,10 @@
 require 'ruby-processing'
 require 'Rover'
+require 'js'
+
+__persistent__ = true
 class ArmSim < Processing::App
+	load_library "control_panel"
 	attr_accessor :rover
 	def setup
 		@y_dir = 0
@@ -13,39 +17,62 @@ class ArmSim < Processing::App
 		end
 
 		method_setup
-
+		setup_options
 		setup_seg
 		
 		@endTarget = { :x=>629 , :y=>600 }
 		@target = { :x=>729 , :y=>599 }
-		size(1000, 1000)
+		size(700, 500)
 		smooth()
 		strokeWeight(20.0)
 		stroke(0, 100)
 		fill(0, 102, 153)
+		@js = Joystick.new
+		Thread.new{
+			@js.start
+		}
+		#frameRate()
+	end
+
+	def setup_options
+		control_panel do |c|
+			#c.slider :opacity
+			c.slider(:stepSize, 0..15, 1)
+			c.slider(:calculate, 0..10, 3)
+			#c.checkbox :paused
+			#c.button :reset
+			c.title = "Arm Sim control panel"
+    	end
 	end
 
 	def setup_seg
-		@rover = Rover.instance 
+		@rover = Rover.instance
+		#@rover = Rover.new
+		#@rover.__persistent__ = true 
 		@seg = @rover.arm.segments
+		@counter = 0
 	end
 
 	def draw
-		#check_js()
+		#if @counter == 0
+			check_js()
+		#	@counter = 50
+		#end
+		#@counter -= 1
 		background(226)
 		
-		display_text
+		#display_text
 
 		pushMatrix()
 			draw_arm
 		popMatrix()
-
+		@seg[1].angle = @seg[1].angle2
 		@seg[2].angle = calculate_angle(@seg[1].angle2,@seg[2].angle2);
 		@seg[3].angle = calculate_angle(@seg[2].angle2,@seg[3].angle2);
 	end
 
 	def calculate_angle(angle1, angle2)
-		180 - (angle1 - angle2)
+		(2 * PI - (angle1 - angle2) )% (2*PI)
 	end
 
 	def display_text
@@ -141,30 +168,18 @@ class ArmSim < Processing::App
 		end
 	end
 	def check_js
-		@mode = :key
-		@keypressed = key
-		ev = joy.ev
-		if ev.type == Joystick::Event::AXIS then
-			if ev.num == 5 then
-				if ev.val > 0 then
-					@y_dir = 1
-				elsif ev.val < 0 then
-					@y_dir = -1
-				else
-					@y_dir = 0
-				end
-			elsif ev.num == 4 then
-				if ev.val > 0 then
-					@x_dir = 1
-				elsif ev.val < 0 then
-					@x_dir = -1
-				else
-					@x_dir = 0
-				end
-			end
-		end
+		if @js.change
+			#@js.change = false
+			@mode = :key
 		
-		@endTarget[:x] = endPoint[:x] + @stepSize*@x_dir
-		@endTarget[:y] = endPoint[:y] + @stepSize*@y_dir
+			@left_axis_x  =  @js.axis[0]/32767.0
+			@left_axis_y  =  @js.axis[1]/32767.0
+			@right_axis_x =  @js.axis[3]/32767.0
+			@right_axis_y =  @js.axis[4]/32767.0
+			@endTarget[:x] = endPoint[:x] + @stepSize * @left_axis_x
+			@endTarget[:y] = endPoint[:y] + @stepSize * @left_axis_y
+		end
 	end
 end
+
+a = ArmSim.new

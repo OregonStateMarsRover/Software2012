@@ -1,5 +1,5 @@
-require 'ArmSim'
-require 'WheelSim'
+#require 'ArmSim'
+#require 'WheelSim'
 require 'ruby-processing'
 
 class Interface < Processing::App

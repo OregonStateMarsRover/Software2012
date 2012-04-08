@@ -1,7 +1,7 @@
 
 def method_setup
-	@stepSize = 1
-	@calculate = 20
+	@stepSize = 3
+	@calculate = 3
 end
 
 def draw_arm
@@ -11,7 +11,7 @@ def draw_arm
 	}
 	
 	nextTarget()
-	@calculate.times {
+	@calculate.to_i.times {
 		reachSegment(@seg[2], @endTarget)
 		reachSegment(@seg[1], @target)	
 	}

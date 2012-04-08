@@ -24,7 +24,7 @@ class Rover
 			@actuators  = [Actuator.new, Actuator.new]
 			@probe = Probe.new
 			@voltage = Voltage.new
-			seg0 = Segment.new(100,0,{:x=>300,:y=>500},{:min=>toRad(180.0), :max=>toRad(180.0)})
+			seg0 = Segment.new(100,0,{:x=>200,:y=>300},{:min=>toRad(180.0), :max=>toRad(180.0)})
 			seg1 = Segment.new(140,PI/4,{:x=>0,:y=>0},{:min=>toRad(13.0), :max=>toRad(156.0)})
 			seg2 = Segment.new(130,-PI/4,{:x=>0,:y=>0},{:min=>toRad(-182.0), :max=>toRad(22.0)})
 			seg3 = Segment.new(100,PI/6,{:x=>0,:y=>0},{:min=>toRad(-85.0), :max=>toRad(94.0)})
@@ -57,8 +57,12 @@ class Rover
 	end
 
 	class Tripod
+		attr_accessor :actuators, :zoom, :pos
 		def initialize
+
 			@actuators  = [Actuator.new, Actuator.new]
+			@zoom = 0.5
+			@pos = {:x => 50+100 , :y => 50}
 		end
 	end
 

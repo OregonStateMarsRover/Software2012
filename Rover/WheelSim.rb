@@ -6,34 +6,53 @@ require 'js'
 #require 'HScrollbar'
 
 class WheelSim < Processing::App
-  attr_accessor :wheels, :rover
+	load_library "control_panel"
+	attr_accessor :wheels, :rover, :js, :cp
 	def setup
 		setup_wheels
 		setup_constants
-		size(500, 500)
+		setup_options
+		size(500, 300)
 		smooth()
 		strokeWeight(1.0)
 		stroke(0, 100)
 		fill(0, 102, 153)
-		@hs1 = HScrollbar.new(0,400,10)
-		@hs2 = HScrollbar.new(0,400,40)
-		@offset_detail = {:x => 300, :y => 200}
-		@drive_mode = :explicit
+		@offset_detail = {:x => 300, :y => 50}
+		@drive_mode = "explicit"
 		@js = Joystick.new
 		Thread.new{
 			@js.start
 		}
+		@cp = control_panel
+	end
+
+	def setup_options
+		control_panel do |c|
+      		#c.slider :opacity
+      		c.slider(:vMax, 0..1.7, 1.3)
+      		c.menu(:drive_mode, ["explicit","vector","zeroRadius"], "explicit")
+      		c.menu(:button1, ["explicit","vector","zeroRadius"], "explicit")
+      		c.menu(:button2, ["explicit","vector","zeroRadius"], "vector")
+      		c.menu(:button3, ["explicit","vector","zeroRadius"], "zeroRadius")
+      		#c.checkbox :paused
+      		#c.button :reset
+      		c.title = "Wheel Sim control panel"
+    	end
 	end
 
 	def setup_wheels
- 		@offset = {:x => 50, :y => 200}
+ 		@offset = {:x => 50, :y => 50}
 		@rover = Rover.instance
 		@wheels = @rover.wheels
+		@camera = @rover.tripod
+		@camera.pos = {:x => @offset[:x]+100 , :y => @offset[:y]}
 		@current_wheel = @wheels[0] 
 	end
 
+
+
 	def draw
-		puts @js.to_s
+		#puts @js.to_s
 		background(226)
 		pushMatrix()
 		translate(@offset[:x], @offset[:y])
@@ -43,11 +62,15 @@ class WheelSim < Processing::App
 		connect @wheels[0], @wheels[3], @wheels[1], @wheels[2]
 		connect @wheels[0], @wheels[3], @wheels[4], @wheels[5]
 		connect @wheels[1], @wheels[2], @wheels[4], @wheels[5]
-		if @drive_mode == :explicit
+		mode_check
+		if @drive_mode == "explicit"
+			@cp.elements[1].set_selected_index(0)
 			explicit
-		elsif @drive_mode == :vector
+		elsif @drive_mode == "vector"
+			@cp.elements[1].set_selected_index(1)
 			vector
-		elsif @drive_mode == :zeroRadius
+		elsif @drive_mode == "zeroRadius"
+			@cp.elements[1].set_selected_index(2)
 			zeroRadius
 		end
 
@@ -63,15 +86,41 @@ class WheelSim < Processing::App
 		popMatrix()
 
 		pushMatrix()
+			draw_camera
+		popMatrix()
+
+		pushMatrix()
 			details(@current_wheel)
 		popMatrix()
 
 		strokeWeight(1.0)
-		@hs1.update
-		@hs2.update
-		@hs1.display
-		@hs2.display
-		display_mode
+		#display_mode
+	end
+
+	def mode_check
+		if @js.button[1] == 1
+			@drive_mode = @button1
+		end
+		if @js.button[2] == 1
+			@drive_mode = @button2
+		end
+		if @js.button[3] == 1
+			@drive_mode = @button3
+		end
+		
+	end
+
+	def draw_camera
+		strokeWeight(3)
+		line(@offset[:x]+100, @offset[:y]+100, @camera.pos[:x],@camera.pos[:y] )
+		strokeWeight(0)
+		ellipse(@camera.pos[:x],@camera.pos[:y],10,10)
+		translate(@offset[:x]+100, @offset[:y]+100)
+		strokeWeight(0)
+		fill(0, 102, 153)
+		rect(-20, -15, 40, 30)
+		rect(-10, -25, 20, 30)
+		strokeWeight(5)
 	end
 
 	def display_mode
@@ -143,8 +192,12 @@ class WheelSim < Processing::App
 		rotate(-wheel.angle)
 		heigth = 60
 		width = 30
-		fill(0, 102, 153)
+		fill(255)
 		rect(-width/2, -heigth/2, width, heigth)
+		strokeWeight(0)
+		fill(0, 102, 153)
+		rect(-width/2, 0, width, heigth*(wheel.velocity/@vMax)*0.5)
+		strokeWeight(5.0)
 		fill(0, 0, 0)
 		text("#{wheel.id-1}",0,0)
 	end
@@ -154,52 +207,4 @@ class WheelSim < Processing::App
 		return mouse_x.between?(wheel.pos[:x]-15+@offset[:x],wheel.pos[:x]+15+@offset[:x]) && mouse_y.between?(wheel.pos[:y]-15+@offset[:y],wheel.pos[:y]+15+@offset[:y])
 	end
 
-	class HScrollbar
-		attr_accessor :right, :left, :y
-   
-		def initialize(left,right,y)
-			@right = right
-			@left = left
-			@y = y
-			@pos = (@right + @left)/2
-		end
-
-		def value
-			return (@pos*200.0)/(@right - @left)-100
-		end
-
-		def update
-			@over = over?
-			if mouse_pressed? && @over
-				@locked = true
-			end
-			if !mouse_pressed?
-				@locked = false
-			end
-			if @locked
-				@pos = constrain(mouse_x,@left,@right)
-			end
-		end
-
-		def constrain(val,left,right)
-			return right if val > right
-			return left if val < left
-			return val
-		end
-    
-
-		def display
-			fill(255)
-			rect(@left,@y,@right - @left + 10 , 10)
-			fill(102, 102, 102);
-			rect(@pos,@y,10,10)
-			fill(0, 0, 0)
-			text("#{value}",@pos,@y)
-		end
-
-		def over?
-			return mouseX > @pos && mouseX < @pos+10 && mouseY > @y && mouseY < @y+10
-		end
-	end
 end
-

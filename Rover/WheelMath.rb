@@ -24,8 +24,8 @@ def input_joystick
 	#@left_joystick_percent = @hs2.value
 	@left_axis_x =   @js.axis[0]/327.67
 	@left_axis_y =  -@js.axis[1]/327.67
-	@right_axis_x =  @js.axis[2]/327.67
-	@right_axis_y =  -@js.axis[3]/327.67
+	@right_axis_x =  @js.axis[3]/327.67
+	@right_axis_y =  -@js.axis[4]/327.67
 
 end
 
@@ -33,7 +33,7 @@ end
 def explicit
 	input_joystick
 #outputs (target values)
-	c = (@right_axis_y/100.0)*@cMax
+	c = (@right_axis_x/100.0)*@cMax
 	v = (@left_axis_y/100.0)*@vMax
 	r = 1.0/c
 #(radians) steering angle of wheel 1
@@ -91,9 +91,9 @@ def vector
 	#theta = (@right_axis_y/100.0)*@thetaMax
 	theta = atan2(@right_axis_y,@right_axis_x) - Math::PI/2
 #(m/s) linear velocity of all drive wheels
-	#v = (@left_axis_y/100.0)*@vMax
-	v = ((@right_axis_y/100)**2.0+(@right_axis_x/100)**2.0)**0.5*@vMax
-	v = @vMax if v > @vMax
+	v = (@left_axis_y/100.0)*@vMax
+	#v = ((@right_axis_y/100)**2.0+(@right_axis_x/100)**2.0)**0.5*@vMax
+	#v = @vMax if v > @vMax
 #(radians/s) rotation rate of all drive motors
 	omega = v/@R
 
@@ -133,7 +133,7 @@ def zeroRadius
     
 
 #(m/s) linear velocity of drive wheel 1
-	v1 = (@left_axis_y/100.0)*@vMax*0.5
+	v1 = (@left_axis_x/100.0)*@vMax*0.5
 	v2 = v1*(@w/(@b**2 + @w**2)**0.5)
 	v3 = v1
 	v4 = -v1
