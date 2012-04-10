@@ -30,6 +30,7 @@ class WheelSim < Processing::App
 		control_panel do |c|
       		#c.slider :opacity
       		c.slider(:vMax, 0..1.7, 1.3)
+      		c.slider(:camera_speed, 0..4, 1)
       		c.menu(:drive_mode, ["explicit","vector","zeroRadius"], "explicit")
       		c.menu(:button1, ["explicit","vector","zeroRadius"], "explicit")
       		c.menu(:button2, ["explicit","vector","zeroRadius"], "vector")
@@ -64,13 +65,13 @@ class WheelSim < Processing::App
 		connect @wheels[1], @wheels[2], @wheels[4], @wheels[5]
 		mode_check
 		if @drive_mode == "explicit"
-			@cp.elements[1].set_selected_index(0)
+			@cp.elements[2].set_selected_index(0)
 			explicit
 		elsif @drive_mode == "vector"
-			@cp.elements[1].set_selected_index(1)
+			@cp.elements[2].set_selected_index(1)
 			vector
 		elsif @drive_mode == "zeroRadius"
-			@cp.elements[1].set_selected_index(2)
+			@cp.elements[2].set_selected_index(2)
 			zeroRadius
 		end
 
@@ -86,6 +87,8 @@ class WheelSim < Processing::App
 		popMatrix()
 
 		pushMatrix()
+			#puts over_camera?
+			update_camera
 			draw_camera
 		popMatrix()
 
@@ -116,11 +119,60 @@ class WheelSim < Processing::App
 		strokeWeight(0)
 		ellipse(@camera.pos[:x],@camera.pos[:y],10,10)
 		translate(@offset[:x]+100, @offset[:y]+100)
+		rotate(-@camera.angle)
 		strokeWeight(0)
 		fill(0, 102, 153)
 		rect(-20, -15, 40, 30)
 		rect(-10, -25, 20, 30)
 		strokeWeight(5)
+	end
+
+	def over_camera?
+		if 5 > ((mouseX - @camera.pos[:x])**2 + (mouseY - @camera.pos[:y])**2) ** 0.5
+			return true
+		end
+
+		return false
+	end
+
+	def update_camera
+		if mouse_pressed? && over_camera?
+			@locked = true
+		end
+		if !mouse_pressed?
+			@locked = false
+		end
+		h = @camera.zoom*100+40
+		move_camera h
+		if @locked
+			dx = (@offset[:x]+100) - mouseX
+			dy = (@offset[:y]+100) - mouseY
+			@camera.angle = atan2(dx, dy)
+			h = (dx**2 + dy**2)**0.5
+			h = constrain(h,40,140)
+		end
+		h += (@js.axis[2]+32767)/(327.67*2)/100
+		h -= (@js.axis[5]+32767)/(327.67*2)/100
+		h = constrain(h,40,140)
+		@camera.zoom = (h-40.0)/100.0
+		@camera.pos[:x] = -sin(@camera.angle) * h + @offset[:x]+100
+		@camera.pos[:y] = -cos(@camera.angle) * h + @offset[:y]+100
+	end
+
+	def move_camera h
+		@camera.angle -= (@js.axis[6]/32767.0)*@camera_speed/h
+	end
+
+	def constrain(val,left,right)
+      return right if val > right
+      return left if val < left
+      return val
+    end
+
+	def update_camera_angle
+		dx = (@offset[:x]+100) - @camera.pos[:x]
+		dy = (@offset[:y]+100) - @camera.pos[:y]
+		atan2(dx, dy)
 	end
 
 	def display_mode

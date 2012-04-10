@@ -1,8 +1,8 @@
 class Joystick
 	attr_accessor :axis, :button, :change, :running
 	def initialize
-		@axis = Array::new(6,0)
-		@button = Array::new(12,0)
+		@axis = Array::new(8,0)
+		@button = Array::new(5,0)
 		@change = false
 		@thread = false
 	end
@@ -12,17 +12,17 @@ class Joystick
 		@thread = true
 		while @running
 			p = pipe.readline
-			puts p
+			#puts p
 			if m = (/^Event: type (\d+?), time (\d+?), number (\d), value (-??)(\d+?)$/).match(p)
 				type = m[1].to_i
 				time = m[2].to_i
 				number = m[3].to_i
 				value = (m[4]+m[5]).to_i
 				if type == 1
-					puts "button[#{number}] = #{value}"
+					#puts "button[#{number}] = #{value}"
 					@button[number] = value
 				elsif type == 2
-					puts "axis[#{number}] = #{value}"
+					#puts "axis[#{number}] = #{value}"
 					@axis[number] = value
 				end
 				puts to_s

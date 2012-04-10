@@ -57,9 +57,9 @@ class Rover
 	end
 
 	class Tripod
-		attr_accessor :actuators, :zoom, :pos
+		attr_accessor :actuators, :zoom, :pos, :angle
 		def initialize
-
+			@angle = 0 
 			@actuators  = [Actuator.new, Actuator.new]
 			@zoom = 0.5
 			@pos = {:x => 50+100 , :y => 50}
