@@ -7,11 +7,12 @@ class Joystick
 		@thread = false
 	end
 	def start
-		pipe = IO.popen("jstest --event /dev/input/js1", "r")
+		pipe = IO.popen("jstest --event /dev/input/js0", "r")
 		@running = true
 		@thread = true
 		while @running
 			p = pipe.readline
+			puts p.size
 			#puts p
 			if m = (/^Event: type (\d+?), time (\d+?), number (\d), value (-??)(\d+?)$/).match(p)
 				type = m[1].to_i
@@ -28,6 +29,7 @@ class Joystick
 				puts to_s
 				@change = true
 			end
+			#sleep(0.005)
 		end
 		pipe.close
 		@thread = false
