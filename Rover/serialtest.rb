@@ -49,17 +49,17 @@ end
 def main
 	SerialPort.open "/dev/ttyUSB0", 115200,8,1,SerialPort::NONE do |sp|
 		#puts "Sending message"
-		send(sp,2,"MABCDEFGHIJKL")
+		#send(sp,5,"XXXX")
 
-
-		data, check = read(sp)
-		if check then
-			print data
-			puts
-		else
-			puts "checksum failed"
+		while 1
+			data, check = read(sp)
+			if check then
+				print data
+				puts
+			else
+				puts "checksum failed"
+			end
 		end
-	
 	end
 
 end
